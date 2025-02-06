@@ -2,7 +2,7 @@
 set -e
 
 repo="kassett/gh-commit"
-tag="v0.1.0"
+tag="v0.0.2"
 
 extension_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 tag_path="${extension_path}/dist/${tag}"
