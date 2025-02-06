@@ -1,0 +1,55 @@
+name: PR Validation Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-pr:
+    name: Validate Pull Request
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23.3
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+          DEFAULT_BRANCH: ${{ github.head_ref }}
+          RELEASE_BRANCHES: ${{ github.head_ref }}
+          DRY_RUN: true
+
+      - name: Replace tag in gh-commit file
+        shell: bash
+        env:
+          NEW_VERSION: ${{ steps.tag_version.outputs.new_tag }}
+          FILE_PATH: gh-commit
+        run: |
+          sed -i "s/tag=\"[^\"]*\"/tag=\"$NEW_VERSION\"/" "$FILE_PATH"
+
+      - name: Commit Files
+        id: commit
+        uses: kassett/autocommit-changes@v1
+        with:
+          commit-message: "Updating tracked Git version in source code"
+          branch: ${{ github.head_ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
