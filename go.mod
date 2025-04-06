@@ -1,4 +1,4 @@
-module gh-commit
+module github.com/kassett/gh-commit
 
 go 1.23
 
