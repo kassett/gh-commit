@@ -63,7 +63,7 @@ func ListAllFilesByPattern(patterns ...string) ([]string, error) {
 	return files, nil
 }
 
-func ValidateGitRepo() (string, error) {
+func ValidateLocalGit() (string, error) {
 	// Ensure we are inside a Git repo
 	cmd := exec.Command("git", "rev-parse", "--is-inside-work-tree")
 	if err := cmd.Run(); err != nil {

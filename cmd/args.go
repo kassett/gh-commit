@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/cli/go-gh"
 	"github.com/google/uuid"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
@@ -52,10 +53,10 @@ var (
 	PrTitleFlag = Flag{Short: "T", Long: "title", Description: "The title of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
 	PrDescFlag  = Flag{Short: "D", Long: "pr-description", Description: "The description of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
 	PrLabelFlag = Flag{Short: "l", Long: "label", Description: "A list of labels to add to the PR created. Only relevant if used in conjunction with the --use-pr flag. Labels can be added recursively -- i.e. -l feature -l blocked.", Type: "stringSlice"}
-	SyncLocal   = Flag{Short: "s", Long: "sync-local", Description: "Sync the local branch with the remote branch. Only relevant if the target branch is the same as the local branch. Incompatible with --use-pr flag.", Type: "bool"}
-	AllFlag     = Flag{Short: "A", Long: "all", Description: "Commit all tracked files that have changed. Only relevant if the target branch is the same as the local branch.", Type: "bool"}
-	Untracked   = Flag{Short: "U", Long: "untracked", Description: "Include untracked files in the commit. Only relevant if used in conjunction with the --all flag.", Type: "bool"}
-	DryRun      = Flag{Short: "d", Long: "dry-run", Description: "Show which files would be committed.", Type: "bool"}
+	SyncLocal   = Flag{Short: "s", Long: "sync-local", Description: "Sync the local branch with the remote branch. Only relevant if the target branch is the same as the local branch. Incompatible with --use-pr flag.", Type: "bool", Default: "false"}
+	AllFlag     = Flag{Short: "A", Long: "all", Description: "Commit all tracked files that have changed. Only relevant if the target branch is the same as the local branch.", Type: "bool", Default: "false"}
+	Untracked   = Flag{Short: "U", Long: "untracked", Description: "Include untracked files in the commit. Only relevant if used in conjunction with the --all flag.", Type: "bool", Default: "false"}
+	DryRun      = Flag{Short: "d", Long: "dry-run", Description: "Show which files would be committed.", Type: "bool", Default: "false"}
 )
 
 var allFlags = []Flag{
@@ -85,9 +86,15 @@ type CommitSettings struct {
 	CommitToBranch string
 }
 
+type RepoSettings struct {
+	DefaultBranch    string
+	DefaultBranchSha string
+}
+
 type RunSettings struct {
 	PrSettings     *PrSettings
 	CommitSettings *CommitSettings
+	RepoSettings   *RepoSettings
 	FileSelection  []string
 	SyncLocal      bool
 	DryRun         bool
@@ -143,11 +150,11 @@ func GetFileSelection(args []string, commitAll bool, commitUntracked bool) ([]st
 	return append(filesToAdd, stagedFiles...), nil
 }
 
-func validateAndConfigureRun(args []string, cmd *cobra.Command) (*RunSettings, error) {
+func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings) (*RunSettings, error) {
 	fileSelection, err := GetFileSelection(
 		args,
-		func() bool { b, _ := cmd.Flags().GetBool("commit-all"); return b }(),
-		func() bool { b, _ := cmd.Flags().GetBool("commit-untracked"); return b }(),
+		func() bool { b, _ := cmd.Flags().GetBool(AllFlag.Long); return b }(),
+		func() bool { b, _ := cmd.Flags().GetBool(Untracked.Long); return b }(),
 	)
 	if err != nil {
 		return nil, err
@@ -209,6 +216,7 @@ func validateAndConfigureRun(args []string, cmd *cobra.Command) (*RunSettings, e
 		FileSelection:  fileSelection,
 		SyncLocal:      syncLocal,
 		DryRun:         dryRun,
+		RepoSettings:   rs,
 	}
 
 	fmt.Println(fileSelection)
@@ -262,14 +270,24 @@ var rootCmd = &cobra.Command{
 			fmt.Println("gh-commit", VERSION)
 		}
 
-		path, err := ValidateGitRepo()
+		path, err := ValidateLocalGit()
 		if err != nil {
 			return err
 		} else {
 			RootPath = path
 		}
 
-		settings, _ := validateAndConfigureRun(args, cmd)
+		repoSettings, err := ValidateGitRemote()
+		if err != nil {
+			return err
+		}
+
+		_, err = gh.CurrentRepository()
+		if err != nil {
+			return err
+		}
+
+		settings, _ := ValidateAndConfigureRun(args, cmd, repoSettings)
 		if settings.DryRun {
 			settings.ExecuteDryRun()
 		} else {
@@ -279,23 +297,4 @@ var rootCmd = &cobra.Command{
 
 		return nil
 	},
-}
-
-func init() {
-	for _, flag := range allFlags {
-		switch flag.Type {
-		case "bool":
-			rootCmd.Flags().BoolP(flag.Long, flag.Short, flag.Default == "true", flag.Description)
-		case "string":
-			rootCmd.Flags().StringP(flag.Long, flag.Short, flag.Default, flag.Description)
-		case "stringSlice":
-			rootCmd.Flags().StringSliceP(flag.Long, flag.Short, []string{}, flag.Description)
-		}
-		if flag.Required {
-			_ = rootCmd.MarkFlagRequired(flag.Long)
-		}
-	}
-
-	rootCmd.Flags().BoolP("version", "V", false, "Print current version")
-	rootCmd.SetHelpTemplate(generateHelpText())
 }
