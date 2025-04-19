@@ -278,8 +278,5 @@ func CreatePullRequest(baseRef, headRef, title, description string, labels []str
 			return errors.New(fmt.Sprint("error creating pull request: ", err))
 		}
 	}
-
-	fmt.Println(prResponse.Url)
-
 	return nil
 }
