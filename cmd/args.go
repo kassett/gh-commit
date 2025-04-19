@@ -186,7 +186,7 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		}
 
 		if description == "" {
-			title = description
+			description = commitMessage
 		}
 
 		prSettings = &PrSettings{
@@ -288,6 +288,16 @@ var rootCmd = &cobra.Command{
 		}
 
 		settings, _ := ValidateAndConfigureRun(args, cmd, repoSettings)
+		// TODO Validate that you can find all the files
+
+		// Check all labels exist
+		if settings.PrSettings != nil && len(settings.PrSettings.Labels) > 0 {
+			err = ValidateAllLabels(settings.PrSettings.Labels)
+			if err != nil {
+				return err
+			}
+		}
+
 		if settings.DryRun {
 			settings.ExecuteDryRun()
 		} else {
