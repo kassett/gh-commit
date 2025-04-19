@@ -20,6 +20,8 @@ func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
 
+var executor CommandExecutor = &DefaultCommandExecutor{}
+
 func init() {
 	for _, flag := range allFlags {
 		switch flag.Type {
