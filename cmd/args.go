@@ -53,7 +53,6 @@ var (
 	PrTitleFlag = Flag{Short: "T", Long: "title", Description: "The title of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
 	PrDescFlag  = Flag{Short: "D", Long: "pr-description", Description: "The description of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
 	PrLabelFlag = Flag{Short: "l", Long: "label", Description: "A list of labels to add to the PR created. Only relevant if used in conjunction with the --use-pr flag. Labels can be added recursively -- i.e. -l feature -l blocked.", Type: "stringSlice"}
-	SyncLocal   = Flag{Short: "s", Long: "sync-local", Description: "Sync the local branch with the remote branch. Only relevant if the target branch is the same as the local branch. Incompatible with --use-pr flag.", Type: "bool", Default: "false"}
 	AllFlag     = Flag{Short: "A", Long: "all", Description: "Commit all tracked files that have changed. Only relevant if the target branch is the same as the local branch.", Type: "bool", Default: "false"}
 	Untracked   = Flag{Short: "U", Long: "untracked", Description: "Include untracked files in the commit. Only relevant if used in conjunction with the --all flag.", Type: "bool", Default: "false"}
 	DryRun      = Flag{Short: "d", Long: "dry-run", Description: "Show which files would be committed.", Type: "bool", Default: "false"}
@@ -67,7 +66,6 @@ var allFlags = []Flag{
 	PrTitleFlag,
 	PrDescFlag,
 	PrLabelFlag,
-	SyncLocal,
 	AllFlag,
 	Untracked,
 	DryRun,
@@ -96,7 +94,6 @@ type RunSettings struct {
 	CommitSettings *CommitSettings
 	RepoSettings   *RepoSettings
 	FileSelection  []string
-	SyncLocal      bool
 	DryRun         bool
 }
 
@@ -168,7 +165,6 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 	usePr, _ := cmd.Flags().GetBool(UsePrFlag.Long)
 	branch, _ := cmd.Flags().GetString(BranchFlag.Long)
 	commitMessage, _ := cmd.Flags().GetString(MessageFlag.Long)
-	syncLocal, _ := cmd.Flags().GetBool(SyncLocal.Long)
 
 	if usePr {
 		headRef, _ := cmd.Flags().GetString(HeadRefFlag.Long)
@@ -214,7 +210,6 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		PrSettings:     prSettings,
 		CommitSettings: commitSettings,
 		FileSelection:  fileSelection,
-		SyncLocal:      syncLocal,
 		DryRun:         dryRun,
 		RepoSettings:   rs,
 	}
