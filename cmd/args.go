@@ -4,11 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cli/go-gh"
+	"github.com/fatih/color"
 	"github.com/google/uuid"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
 	"strings"
+	"text/tabwriter"
 )
 
 type Flag struct {
@@ -103,15 +106,20 @@ func GetFileSelection(args []string, commitAll bool, commitUntracked bool) ([]st
 	}
 
 	if len(args) == 0 {
-		log.Println("[DEBUG] No explicit file selection.")
+		fmt.Println(color.New(color.FgYellow).Sprintf("⚠️  No explicit file selection."))
+
 		if !commitAll {
-			return nil, errors.New("no files were selected for commit")
+			return nil, fmt.Errorf("%s %s",
+				color.New(color.FgRed, color.Bold).Sprint("❌ Error:"),
+				"No files were selected for commit",
+			)
 		}
 	}
 
 	stagedFiles, err := ListStagedFiles()
 	if err == nil && len(stagedFiles) > 0 {
-		log.Printf("[WARN] %d file(s) are already staged for commit\n", len(stagedFiles))
+		warn := color.New(color.FgYellow, color.Bold).Sprintf("⚠️  %d file(s) are already staged for commit", len(stagedFiles))
+		log.Println(warn)
 	}
 
 	untrackedFiles, err := ListUntrackedFiles()
@@ -157,7 +165,10 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		return nil, err
 	}
 
-	log.Printf("[DEBUG] Selected %d file(s) for commit\n", len(fileSelection))
+	fmt.Printf("%s Selected %d file(s) for commit\n",
+		color.New(color.FgGreen).Sprint("✅"),
+		len(fileSelection),
+	)
 
 	var prSettings *PrSettings
 	var commitSettings *CommitSettings
@@ -214,7 +225,18 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		RepoSettings:   rs,
 	}
 
-	fmt.Println(fileSelection)
+	if len(fileSelection) > 0 {
+		header := color.New(color.FgCyan, color.Bold).Sprint("📦 Files selected for commit:")
+		fmt.Println(header)
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		for i, file := range fileSelection {
+			index := color.New(color.FgYellow).Sprintf("%d.", i+1)
+			name := color.New(color.FgWhite).Sprint(file)
+			_, _ = fmt.Fprintf(w, "%s\t%s\n", index, name)
+		}
+		_ = w.Flush()
+	}
 	return runSettings, nil
 }
 
@@ -261,8 +283,14 @@ var rootCmd = &cobra.Command{
 	Long:  "gh-commit: a CLI tool for committing changes via the Github API, especially useful for working in ephemeral environments.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		version, _ := cmd.Flags().GetBool("version")
+
 		if version {
-			fmt.Println("gh-commit", VERSION)
+			fmt.Printf("%s %s %s\n",
+				color.New(color.FgBlue, color.Bold).Sprint("🔖 gh-commit"),
+				color.New(color.FgGreen).Sprint(VERSION),
+				color.New(color.Faint).Sprint("(CLI tool)"),
+			)
+			return nil
 		}
 
 		path, err := ValidateLocalGit()
