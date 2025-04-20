@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/repository"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"
@@ -42,11 +43,14 @@ func init() {
 }
 
 func (rn *RunSettings) ExecuteDryRun() {
-	fmt.Print("The following files would be committed:\n\n")
+	heading := color.New(color.FgCyan, color.Bold).SprintFunc()
+	fmt.Printf("%s\n\n", heading("The following files would be committed:"))
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for i, item := range rn.FileSelection {
-		_, _ = fmt.Fprintf(w, "%d.\t%s\n", i+1, item)
+		index := color.New(color.FgYellow).Sprintf("%d.", i+1)
+		filename := color.New(color.FgWhite).Sprint(item)
+		_, _ = fmt.Fprintf(w, "%s\t%s\n", index, filename)
 	}
 	_ = w.Flush()
 }
