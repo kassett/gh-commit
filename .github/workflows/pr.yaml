@@ -27,6 +27,10 @@ jobs:
         with:
           go-version: 1.23.3
 
+      - name: Run tests
+        shell: bash
+        run: ( cd cmd ; go test . )
+
       - name: Bump version and push tag
         id: tag_version
         uses: anothrNick/github-tag-action@1.36.0

@@ -10,15 +10,17 @@ import (
 )
 
 // VERSION number: changed in CI
-const VERSION = "0.0.3"
+const VERSION = "v0.0.12"
 
-var RootPath string
+var rootPath string
 var repo repository.Repository
 var client api.RESTClient
 
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
+
+var executor CommandExecutor = &DefaultCommandExecutor{}
 
 func init() {
 	for _, flag := range allFlags {

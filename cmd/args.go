@@ -269,7 +269,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		} else {
-			RootPath = path
+			rootPath = path
 		}
 
 		repoSettings, err := ValidateGitRemote()
