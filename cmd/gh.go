@@ -13,6 +13,7 @@ import (
 	"os"
 )
 
+// YES
 func ValidateGitRemote() (*RepoSettings, error) {
 	restClient, err := gh.RESTClient(nil)
 	// Any error here is fatal
