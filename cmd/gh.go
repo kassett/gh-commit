@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/cli/go-gh"
 	"github.com/cli/go-gh/pkg/api"
+	"github.com/fatih/color"
 	"net/http"
 	"os"
 )
@@ -275,8 +276,12 @@ func CreatePullRequest(baseRef, headRef, title, description string, labels []str
 			nil,
 		)
 		if err != nil {
-			return errors.New(fmt.Sprint("error creating pull request: ", err))
+			return errors.New(fmt.Sprint("error adding labels to pull request: ", err))
 		}
 	}
+
+	link := color.New(color.FgBlue, color.Bold).Sprintf("🔗 Pull Request URL: %s", prResponse.Url)
+	fmt.Println(link)
+
 	return nil
 }
