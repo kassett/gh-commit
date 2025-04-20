@@ -42,6 +42,28 @@ func init() {
 	rootCmd.SetHelpTemplate(generateHelpText())
 }
 
+func isGitHubAction() bool {
+	return os.Getenv("GITHUB_ACTIONS") == "true"
+}
+
+func exportGitHubOutput(key, value string) error {
+	outputPath := os.Getenv("GITHUB_OUTPUT")
+	if outputPath == "" {
+		return fmt.Errorf("GITHUB_OUTPUT not set")
+	}
+
+	f, err := os.OpenFile(outputPath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open GITHUB_OUTPUT file: %w", err)
+	}
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
+
+	_, err = fmt.Fprintf(f, "%s=%s\n", key, value)
+	return err
+}
+
 func (rn *RunSettings) ExecuteDryRun() {
 	heading := color.New(color.FgCyan, color.Bold).SprintFunc()
 	fmt.Printf("%s\n\n", heading("The following files would be committed:"))
