@@ -19,7 +19,7 @@ type DefaultCommandExecutor struct{}
 // RunCommand executes a command and returns its output.
 func (d *DefaultCommandExecutor) RunCommand(name string, arg ...string) ([]byte, error) {
 	cmd := exec.Command(name, arg...)
-	cmd.Dir = RootPath
+	cmd.Dir = rootPath
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	if err := cmd.Run(); err != nil {

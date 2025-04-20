@@ -12,7 +12,7 @@ import (
 // VERSION number: changed in CI
 const VERSION = "0.0.3"
 
-var RootPath string
+var rootPath string
 var repo repository.Repository
 var client api.RESTClient
 
