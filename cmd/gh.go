@@ -289,8 +289,8 @@ func CreatePullRequest(baseRef, headRef, title, description string, labels []str
 	fmt.Println(link)
 
 	if isGitHubAction() {
-		_ = exportGitHubOutput("pr-number", strconv.Itoa(prResponse.Number))
 		_ = exportGitHubOutput("branch", headRef)
+		_ = exportGitHubOutput("pr-number", strconv.Itoa(prResponse.Number))
 	}
 
 	return nil
