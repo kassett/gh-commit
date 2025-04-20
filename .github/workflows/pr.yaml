@@ -42,9 +42,10 @@ jobs:
         shell: bash
         env:
           NEW_VERSION: ${{ steps.tag_version.outputs.new_tag }}
-          FILE_PATH: gh-commit
+          FILE_PATH: cmd/execute.go
         run: |
-          sed -i "s/tag=\"[^\"]*\"/tag=\"$NEW_VERSION\"/" "$FILE_PATH"
+          tmpfile=$(mktemp)
+          sed "s/\(const VERSION = \"\)[^\"]*\(\".*\)/\1${NEW_VERSION}\2/" "${FILE_PATH}" > "$tmpfile" && mv "$tmpfile" "${FILE_PATH}"
 
       - name: Commit Files
         id: commit
