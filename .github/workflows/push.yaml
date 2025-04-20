@@ -32,3 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
+
+      - uses: cli/gh-extension-precompile@2.0.0
+        with:
+          go_version: "1.23"
