@@ -11,6 +11,7 @@ import (
 	"github.com/fatih/color"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func ValidateGitRemote() (*RepoSettings, error) {
@@ -231,6 +232,10 @@ func AssociateCommitWithBranch(branch string, commitSha string) error {
 		}
 	}
 
+	if isGitHubAction() {
+		_ = exportGitHubOutput("sha", commitSha)
+	}
+
 	return err
 }
 
@@ -282,6 +287,11 @@ func CreatePullRequest(baseRef, headRef, title, description string, labels []str
 
 	link := color.New(color.FgBlue, color.Bold).Sprintf("🔗 Pull Request URL: %s", prResponse.Url)
 	fmt.Println(link)
+
+	if isGitHubAction() {
+		_ = exportGitHubOutput("branch", headRef)
+		_ = exportGitHubOutput("pr-number", strconv.Itoa(prResponse.Number))
+	}
 
 	return nil
 }

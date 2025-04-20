@@ -32,6 +32,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
+          DEFAULT_BRANCH: ${{ github.ref_name }}
+          RELEASE_BRANCHES: ${{ github.ref_name }}
 
       - uses: cli/gh-extension-precompile@v2.0.0
         with:
