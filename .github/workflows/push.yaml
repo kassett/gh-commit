@@ -25,15 +25,14 @@ jobs:
         with:
           go-version: 1.23.3
 
-      - name: Bump version and push tag
-        id: tag_version
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          DEFAULT_BUMP: patch
-          DEFAULT_BRANCH: ${{ github.ref_name }}
-          RELEASE_BRANCHES: ${{ github.ref_name }}
+      # TODO Find a better version of anothrNick action that will actually detect
+      - name: Bump version
+        shell: bash
+        run: |
+          version=$(sed -nE 's/^const VERSION = "(.*)"/\1/p' cmd/execute.go)
+          git tag $version
+          git push origin $version
+        
 
       - uses: cli/gh-extension-precompile@v2.0.0
         with:
