@@ -33,9 +33,6 @@ func init() {
 		case "stringSlice":
 			rootCmd.Flags().StringSliceP(flag.Long, flag.Short, []string{}, flag.Description)
 		}
-		if flag.Required {
-			_ = rootCmd.MarkFlagRequired(flag.Long)
-		}
 	}
 
 	rootCmd.Flags().BoolP("version", "V", false, "Print current version")
