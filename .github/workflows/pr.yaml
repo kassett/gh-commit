@@ -10,13 +10,7 @@ jobs:
     name: Validate Pull Request
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      packages: write
-      attestations: write
-      id-token: write
-      security-events: write
-
+    permissions: "write-all"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
