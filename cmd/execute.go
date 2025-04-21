@@ -11,7 +11,7 @@ import (
 )
 
 // VERSION number: changed in CI
-const VERSION = "v0.1.3"
+const VERSION = "v0.1.4"
 
 var rootPath string
 var repo repository.Repository
