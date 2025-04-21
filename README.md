@@ -98,12 +98,9 @@ Signed commits are automatically created when using GitHub Actions.
 
 ---
 
-## 🚤 Version
-
-
 ## 📄 License
 
-MIT © Your Name or Organization
+MIT © github.com/kassett
 
 ---
 
