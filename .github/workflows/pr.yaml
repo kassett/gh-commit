@@ -53,7 +53,7 @@ jobs:
 
       - name: Commit Files
         id: commit
-        uses: kassett/autocommit-changes@v1
+        uses: kassett/autocommit-changes@2025-04-21-migrating-to-gh-commit
         with:
           commit-message: "Updating tracked Git version in source code"
           branch: ${{ github.head_ref }}
