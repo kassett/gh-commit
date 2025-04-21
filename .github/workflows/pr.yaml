@@ -59,3 +59,15 @@ jobs:
           branch: ${{ github.head_ref }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-all: 'true'
+          use-pull-request: 'true'
+
+      - name: Outputs
+        shell: bash
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+          PR_NUMBER: ${{ steps.commit.outputs.pr-number }}
+        run: |
+          echo $SHA
+          echo $BRANCH
+          echo $PR_NUMBER
