@@ -32,17 +32,17 @@ gh commit [files...] -B <branch> -m <message> [flags]
 
 Commit all changes:
 ```bash
-gh-commit -B main -A -m "fix: update configs"
+gh commit -B main -A -m "fix: update configs"
 ```
 
 Create a PR from a new branch:
 ```bash
-gh-commit -B main -A -P -T "Update Configs" -D "This PR updates the configs." -l feature -l ci
+gh commit -B main -A -P -T "Update Configs" -D "This PR updates the configs." -l feature -l ci
 ```
 
 Dry run (shows what would be committed):
 ```bash
-gh-commit -B main -A -d
+gh commit -B main -A -d
 ```
 
 ---
@@ -71,7 +71,7 @@ gh-commit -B main -A -d
 ```yaml
 - name: Commit and Push Changes
   run: |
-    gh-commit -B main -A -m "ci: auto-commit"
+    gh commit -B main -A -m "ci: auto-commit"
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
