@@ -58,4 +58,3 @@ jobs:
           commit-message: "Updating tracked Git version in source code"
           branch: ${{ github.head_ref }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-all: 'true'
