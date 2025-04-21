@@ -11,7 +11,7 @@ import (
 )
 
 // VERSION number: changed in CI
-const VERSION = "v0.1.0"
+const VERSION = "v0.1.1"
 
 var rootPath string
 var repo repository.Repository
@@ -32,9 +32,6 @@ func init() {
 			rootCmd.Flags().StringP(flag.Long, flag.Short, flag.Default, flag.Description)
 		case "stringSlice":
 			rootCmd.Flags().StringSliceP(flag.Long, flag.Short, []string{}, flag.Description)
-		}
-		if flag.Required {
-			_ = rootCmd.MarkFlagRequired(flag.Long)
 		}
 	}
 

@@ -281,17 +281,27 @@ var rootCmd = &cobra.Command{
 	Use:   "gh-commit",
 	Short: "gh-commit: commit files easily to git using the Github API",
 	Long:  "gh-commit: a CLI tool for committing changes via the Github API, especially useful for working in ephemeral environments.",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		version, _ := cmd.Flags().GetBool("version")
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		message, _ := cmd.Flags().GetString(MessageFlag.Long)
+		branch, _ := cmd.Flags().GetString(BranchFlag.Long)
+		versionFlag, _ := cmd.Flags().GetBool("version")
 
-		if version {
+		if versionFlag {
 			fmt.Printf("%s %s %s\n",
 				color.New(color.FgBlue, color.Bold).Sprint("🔖 gh-commit"),
 				color.New(color.FgGreen).Sprint(VERSION),
 				color.New(color.Faint).Sprint("(CLI tool)"),
 			)
-			return nil
+			os.Exit(0)
 		}
+
+		if message == "" || branch == "" {
+			return fmt.Errorf("--message and --branch are both required flags")
+		}
+
+		return nil
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		path, err := ValidateLocalGit()
 		if err != nil {
