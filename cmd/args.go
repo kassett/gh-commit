@@ -287,10 +287,9 @@ var rootCmd = &cobra.Command{
 		versionFlag, _ := cmd.Flags().GetBool("version")
 
 		if versionFlag {
-			fmt.Printf("%s %s %s\n",
+			fmt.Printf("%s %s\n",
 				color.New(color.FgBlue, color.Bold).Sprint("🔖 gh-commit"),
 				color.New(color.FgGreen).Sprint(VERSION),
-				color.New(color.Faint).Sprint("(CLI tool)"),
 			)
 			os.Exit(0)
 		}
