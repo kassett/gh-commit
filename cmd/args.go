@@ -319,8 +319,10 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		settings, _ := ValidateAndConfigureRun(args, cmd, repoSettings)
-		// TODO Validate that you can find all the files
+		settings, err := ValidateAndConfigureRun(args, cmd, repoSettings)
+		if err != nil {
+			return err
+		}
 
 		// Check all labels exist
 		if settings.PrSettings != nil && len(settings.PrSettings.Labels) > 0 {
