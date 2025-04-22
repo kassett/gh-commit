@@ -19,4 +19,5 @@ cat tmp/random2.txt
 
 git switch -
 sleep 2
+git branch -D $branch
 git push origin --delete $branch
