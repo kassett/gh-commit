@@ -23,6 +23,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run nightly script
+        shell: bash
         run: ./integrationTests/general.sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
