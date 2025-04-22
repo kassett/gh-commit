@@ -1,5 +1,7 @@
 #!/bin/bash
 
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
 for i in {1..2}; do
   mkdir tmp > /dev/null 2>&1
   echo "RANDOM1" > tmp/random1.txt
@@ -30,4 +32,5 @@ for i in {1..2}; do
 
   repo_info=$(gh repo view --json owner,name -q '.owner.login + "/" + .name')
   gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
+  git checkout $current_branch
 done
