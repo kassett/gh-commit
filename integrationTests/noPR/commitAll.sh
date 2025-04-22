@@ -18,6 +18,7 @@ cat tmp/random1.txt
 cat tmp/random2.txt
 
 git switch -
-sleep 2
-gh api -X DELETE repos/{owner}/{repo}/git/refs/heads/$branch
-gh api -X DELETE repos/{owner}/{repo}/git/refs/heads/$branch
+sleep 10
+
+repo_info=$(gh repo view --json owner,name -q '.owner.login + "/" + .name')
+gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
