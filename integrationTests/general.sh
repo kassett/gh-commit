@@ -28,7 +28,7 @@ for i in {1..2}; do
   rm -rf tmp
 
   git switch -
-  sleep 10
+  sleep 1
 
   repo_info=$(gh repo view --json owner,name -q '.owner.login + "/" + .name')
   gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
@@ -61,7 +61,7 @@ for i in {1..2}; do
   rm -rf tmp
 
   git switch -
-  sleep 10
+  sleep 1
 
   repo_info=$(gh repo view --json owner,name -q '.owner.login + "/" + .name')
   gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
@@ -96,7 +96,7 @@ for i in {1..2}; do
   rm -rf tmp
 
   git switch -
-  sleep 10
+  sleep 1
 
   pr_number=$(gh pr list --head "$headRef" --json number -q '.[0].number')
   echo $pr_number
