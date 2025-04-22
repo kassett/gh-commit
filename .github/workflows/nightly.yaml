@@ -1,0 +1,29 @@
+name: Nightly check for sustainability
+
+on:
+  schedule:
+    - cron: "0 10 * * *"  # 5 AM EST (GitHub Actions uses UTC)
+  workflow_dispatch:
+
+jobs:
+  run-nightly-script:
+    name: Run nightly sustainability check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # optional: fetch full history if needed
+
+      - name: Install GH extension
+        run: gh extension install kassett/gh-commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run nightly script
+        shell: bash
+        run: ./integrationTests/general.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
