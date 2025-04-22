@@ -21,6 +21,7 @@ for i in {1..2}; do
       -B $branch
   fi
 
+  rm -rf tmp
   git fetch
   git checkout $branch
 
@@ -54,6 +55,7 @@ for i in {1..2}; do
       -B $branch
   fi
 
+  rm -rf tmp
   git fetch
   git checkout $branch
 
