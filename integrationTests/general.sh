@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 for i in {1..2}; do
@@ -67,7 +69,6 @@ for i in {1..2}; do
   gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
   git checkout $current_branch
 done
-
 
 for i in {1..2}; do
   mkdir tmp > /dev/null 2>&1
