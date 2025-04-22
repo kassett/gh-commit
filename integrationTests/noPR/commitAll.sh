@@ -10,10 +10,13 @@ gh commit -A -U \
     -m "Randomly commit for nightly test." \
     -B $branch
 
+sleep 10
+
 rm -rf tmp
+
 git fetch
 git checkout $branch
-git pull
+
 cat tmp/random1.txt
 cat tmp/random2.txt
 
