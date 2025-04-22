@@ -21,3 +21,4 @@ git switch -
 sleep 2
 git branch -D $branch
 git push origin --delete $branch
+gh api -X DELETE repos/{owner}/{repo}/refs/heads/$branch
