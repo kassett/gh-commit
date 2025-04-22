@@ -19,6 +19,4 @@ cat tmp/random2.txt
 
 git switch -
 sleep 2
-gh api \
-  -X DELETE \
-  "repos/:owner/:repo/git/refs/heads/$branch"
+git push origin --delete $branch
