@@ -11,11 +11,16 @@ gh commit tmp/random1.txt tmp/random2.txt \
     -B $branch
 
 rm -rf tmp
+
 git fetch
 git checkout $branch
-git pull
+
 cat tmp/random1.txt
 cat tmp/random2.txt
 
 git switch -
+sleep 10
+
+repo_info=$(gh repo view --json owner,name -q '.owner.login + "/" + .name')
+gh api -X DELETE repos/$repo_info/git/refs/heads/$branch
 
