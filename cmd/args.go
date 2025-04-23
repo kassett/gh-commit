@@ -170,6 +170,10 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		len(fileSelection),
 	)
 
+	if len(fileSelection) == 0 {
+		os.Exit(0)
+	}
+
 	var prSettings *PrSettings
 	var commitSettings *CommitSettings
 	dryRun, _ := cmd.Flags().GetBool(DryRun.Long)
