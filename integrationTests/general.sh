@@ -110,3 +110,5 @@ for i in {1..2}; do
   gh api -X DELETE repos/$repo_info/git/refs/heads/$headRef
   git checkout $current_branch
 done
+
+gh commit -P -B random-branch-name -m "Random empty commit" -A -U
