@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/repository"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 // VERSION number: changed in CI

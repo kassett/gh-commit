@@ -3,15 +3,16 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+	"text/tabwriter"
+
 	"github.com/cli/go-gh"
 	"github.com/fatih/color"
 	"github.com/google/uuid"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"log"
-	"os"
-	"strings"
-	"text/tabwriter"
 )
 
 type Flag struct {

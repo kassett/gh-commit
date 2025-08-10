@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
-	"github.com/fatih/color"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/cli/go-gh"
+	"github.com/cli/go-gh/pkg/api"
+	"github.com/fatih/color"
 )
 
 func ValidateGitRemote() (*RepoSettings, error) {

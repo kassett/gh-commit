@@ -61,6 +61,8 @@ gh commit -B main -A -d
 | -A    | --all          | `bool`       | Include all tracked files with changes                                     |
 | -U    | --untracked    | `bool`       | Include untracked files (requires `--all`)                                 |
 | -d    | --dry-run      | `bool`       | Show which files would be committed, without committing                    |
+| -b    | --base-commit  | `string`     | Specify a specific commit SHA to use as the base for the new commit       |
+| -f    | --allow-fast-forward | `bool` | Allow fast-forward operations when using --base-commit                    |
 | -V    | --version      | `bool`       | Show version                                                               |
 | -h    | --help         | `bool`       | Show help text                                                             |
 
@@ -77,6 +79,35 @@ gh commit -B main -A -d
 ```
 
 Signed commits are automatically created when using GitHub Actions.
+
+---
+
+## 🔄 Base Commit and Fast-Forward
+
+The `--base-commit` flag allows you to specify a specific commit SHA to use as the base for your new commit. This is particularly useful for:
+
+- **Avoiding duplicate commits** after rebases
+- **Simulating force pushes** without actually force pushing
+- **Maintaining clean commit history** in PRs
+
+### Usage Examples
+
+**Basic base commit usage:**
+```bash
+gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd file.txt
+```
+
+**With fast-forward (simulates force push):**
+```bash
+gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd -f file.txt
+```
+
+### How It Works
+
+- **`--base-commit` only**: Creates a new commit on top of the specified commit, but doesn't modify the branch pointer
+- **`--base-commit` + `--allow-fast-forward`**: Fast-forwards the branch to the specified commit, then creates the new commit on top
+
+This effectively simulates a force push by allowing you to "rewrite history" from a specific point, preventing the "Update is not a fast forward" error.
 
 ---
 
