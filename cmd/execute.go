@@ -2,16 +2,17 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/repository"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 // VERSION number: changed in CI
-const VERSION = "v0.2.4"
+const VERSION = "v0.2.5"
 
 var rootPath string
 var repo repository.Repository
