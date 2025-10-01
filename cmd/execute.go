@@ -79,38 +79,45 @@ func (rn *RunSettings) Commit() error {
 	var err error
 	var commitSha string
 
-	// Create branches so we don't have to worry about those errors later
-	if rn.PrSettings != nil {
-		commitSha, err = EnsureBranchesExist(rn.PrSettings.BaseRef, rn.PrSettings.HeadRef, rn.RepoSettings)
+	if rn.CommitSettings.BaseCommit == "" {
+		// Create branches so we don't have to worry about those errors later
+		if rn.PrSettings != nil {
+			commitSha, err = EnsureBranchesExist(rn.PrSettings.BaseRef, rn.PrSettings.HeadRef, rn.RepoSettings)
+		} else {
+			commitSha, err = EnsureBranchesExist(rn.CommitSettings.CommitToBranch, "", rn.RepoSettings)
+		}
+		if err != nil {
+			return fmt.Errorf("ensuring branch exists: %w", err)
+		}
 	} else {
-		commitSha, err = EnsureBranchesExist(rn.CommitSettings.CommitToBranch, "", rn.RepoSettings)
-	}
-	if err != nil {
-		return err
+		commitSha = rn.CommitSettings.BaseCommit
 	}
 
 	// Commits reference trees. Trees have their own hashes. Get the hash
 	// of the tip of the tree that we are pushing to
 	currentTreeSha, err := GetTreeTip(commitSha)
 	if err != nil {
-		return err
+		return fmt.Errorf("getting tree tip: %w", err)
 	}
 
 	blobs, err := CreateBlobs(rn.FileSelection)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating blobs: %w", err)
 	}
 
 	newTreeSha, err := CreateTree(currentTreeSha, blobs)
-	newCommit, err := CreateCommitFromTree(commitSha, newTreeSha, rn.CommitSettings.CommitMessage)
-
 	if err != nil {
-		return err
+		return fmt.Errorf("creating tree: %w", err)
 	}
 
-	err = AssociateCommitWithBranch(rn.CommitSettings.CommitToBranch, newCommit)
+	newCommit, err := CreateCommitFromTree(commitSha, newTreeSha, rn.CommitSettings.CommitMessage)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating commit from tree: %w", err)
+	}
+
+	err = AssociateCommitWithBranch(rn.CommitSettings.CommitToBranch, newCommit, rn.CommitSettings.AllowFastForward)
+	if err != nil {
+		return fmt.Errorf("associating commit with branch: %w", err)
 	}
 
 	if rn.PrSettings != nil {

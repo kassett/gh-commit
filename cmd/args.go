@@ -53,13 +53,26 @@ var (
 		Type:     "bool",
 	}
 
-	HeadRefFlag = Flag{Short: "H", Long: "head-ref", Description: "The name of the branch created with the base ref being `--branch`. Only relevant if used in conjunction with the --use-pr flag.", Type: "string"}
-	PrTitleFlag = Flag{Short: "T", Long: "title", Description: "The title of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
-	PrDescFlag  = Flag{Short: "D", Long: "pr-description", Description: "The description of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
-	PrLabelFlag = Flag{Short: "l", Long: "label", Description: "A list of labels to add to the PR created. Only relevant if used in conjunction with the --use-pr flag. Labels can be added recursively -- i.e. -l feature -l blocked.", Type: "stringSlice"}
-	AllFlag     = Flag{Short: "A", Long: "all", Description: "Commit all tracked files that have changed. Only relevant if the target branch is the same as the local branch.", Type: "bool", Default: "false"}
-	Untracked   = Flag{Short: "U", Long: "untracked", Description: "Include untracked files in the commit. Only relevant if used in conjunction with the --all flag.", Type: "bool", Default: "false"}
-	DryRun      = Flag{Short: "d", Long: "dry-run", Description: "Show which files would be committed.", Type: "bool", Default: "false"}
+	HeadRefFlag    = Flag{Short: "H", Long: "head-ref", Description: "The name of the branch created with the base ref being `--branch`. Only relevant if used in conjunction with the --use-pr flag.", Type: "string"}
+	PrTitleFlag    = Flag{Short: "T", Long: "title", Description: "The title of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
+	PrDescFlag     = Flag{Short: "D", Long: "pr-description", Description: "The description of the PR created. Only relevant if used in conjunction with the --use-pr flag. If not specified, the PR title will be the commit message.", Type: "string"}
+	PrLabelFlag    = Flag{Short: "l", Long: "label", Description: "A list of labels to add to the PR created. Only relevant if used in conjunction with the --use-pr flag. Labels can be added recursively -- i.e. -l feature -l blocked.", Type: "stringSlice"}
+	AllFlag        = Flag{Short: "A", Long: "all", Description: "Commit all tracked files that have changed. Only relevant if the target branch is the same as the local branch.", Type: "bool", Default: "false"}
+	Untracked      = Flag{Short: "U", Long: "untracked", Description: "Include untracked files in the commit. Only relevant if used in conjunction with the --all flag.", Type: "bool", Default: "false"}
+	DryRun         = Flag{Short: "d", Long: "dry-run", Description: "Show which files would be committed.", Type: "bool", Default: "false"}
+	BaseCommitFlag = Flag{
+		Short:       "b",
+		Long:        "base-commit",
+		Description: "The base commit SHA to use as the base for your new commit",
+		Required:    false,
+		Type:        "string",
+	}
+	AllowFastForwardFlag = Flag{
+		Long:        "allow-fast-forward",
+		Description: "Fast-forwards the branch to the specified commit, then creates the new commit on top",
+		Required:    false,
+		Type:        "bool",
+	}
 )
 
 var allFlags = []Flag{
@@ -73,6 +86,8 @@ var allFlags = []Flag{
 	AllFlag,
 	Untracked,
 	DryRun,
+	BaseCommitFlag,
+	AllowFastForwardFlag,
 }
 
 type PrSettings struct {
@@ -84,8 +99,10 @@ type PrSettings struct {
 }
 
 type CommitSettings struct {
-	CommitMessage  string
-	CommitToBranch string
+	CommitMessage    string
+	CommitToBranch   string
+	BaseCommit       string
+	AllowFastForward bool
 }
 
 type RepoSettings struct {
@@ -181,6 +198,8 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 	usePr, _ := cmd.Flags().GetBool(UsePrFlag.Long)
 	branch, _ := cmd.Flags().GetString(BranchFlag.Long)
 	commitMessage, _ := cmd.Flags().GetString(MessageFlag.Long)
+	baseCommit, _ := cmd.Flags().GetString(BaseCommitFlag.Long)
+	allowFastForward, _ := cmd.Flags().GetBool(AllowFastForwardFlag.Long)
 
 	if usePr {
 		headRef, _ := cmd.Flags().GetString(HeadRefFlag.Long)
@@ -210,15 +229,19 @@ func ValidateAndConfigureRun(args []string, cmd *cobra.Command, rs *RepoSettings
 		}
 
 		commitSettings = &CommitSettings{
-			CommitMessage:  commitMessage,
-			CommitToBranch: headRef,
+			CommitMessage:    commitMessage,
+			CommitToBranch:   headRef,
+			BaseCommit:       baseCommit,
+			AllowFastForward: allowFastForward,
 		}
 
 	} else {
 		prSettings = nil
 		commitSettings = &CommitSettings{
-			CommitMessage:  commitMessage,
-			CommitToBranch: branch,
+			CommitMessage:    commitMessage,
+			CommitToBranch:   branch,
+			BaseCommit:       baseCommit,
+			AllowFastForward: allowFastForward,
 		}
 	}
 
@@ -303,10 +326,16 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("--message and --branch are both required flags")
 		}
 
+		baseCommit, _ := cmd.Flags().GetString(BaseCommitFlag.Long)
+		allowFastForward, _ := cmd.Flags().GetBool(AllowFastForwardFlag.Long)
+		if allowFastForward && baseCommit == "" {
+			return fmt.Errorf("--%s is required if --%s is passed", BaseCommitFlag.Long, AllowFastForwardFlag.Long)
+		}
+
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-
+		cmd.SilenceUsage = true
 		path, err := ValidateLocalGit()
 		if err != nil {
 			return err
