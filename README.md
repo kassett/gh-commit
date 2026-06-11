@@ -94,12 +94,12 @@ The `--base-commit` flag allows you to specify a specific commit SHA to use as t
 
 **Basic base commit usage:**
 ```bash
-gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd file.txt
+gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd -f file.txt
 ```
 
 **With fast-forward (simulates force push):**
 ```bash
-gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd -f file.txt
+gh commit -B main -m "fix: update configs" -b a1b2c3d4e5f6789012345678901234567890abcd --allow-fast-forward -f file.txt
 ```
 
 ### How It Works

@@ -221,10 +221,15 @@ func CreateCommitFromTree(latestCommit, treeSha, commitMessage string) (string, 
 	return newCommitResponse.Sha, nil
 }
 
-func AssociateCommitWithBranch(branch string, commitSha string) error {
+func AssociateCommitWithBranch(branch string, commitSha string, allowFastForward bool) error {
 	body := map[string]interface{}{
 		"sha": commitSha,
 	}
+
+	if allowFastForward {
+		body["force"] = true
+	}
+
 	marshalled, _ := json.Marshal(body)
 	err := client.Post(fmt.Sprintf("repos/%s/%s/git/refs/heads/%s", repo.Owner(), repo.Name(), branch), bytes.NewBuffer(marshalled), nil)
 	if err != nil {
