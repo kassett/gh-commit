@@ -123,6 +123,20 @@ func GetTreeTip(commitSha string) (string, error) {
 	return res.Sha, nil
 }
 
+func fileModeForGitHub(file string) (string, error) {
+	info, err := os.Lstat(file)
+	if err != nil {
+		return "", err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return "120000", nil
+	}
+	if info.Mode()&0111 != 0 {
+		return "100755", nil
+	}
+	return "100644", nil
+}
+
 // CreateBlobs creates the leaves of the trees that commits reference.
 func CreateBlobs(files []string) ([]BlobInfo, error) {
 	blobs := make([]BlobInfo, 0)
@@ -143,9 +157,14 @@ func CreateBlobs(files []string) ([]BlobInfo, error) {
 				return nil, err
 			}
 
+			mode, err := fileModeForGitHub(file)
+			if err != nil {
+				return nil, err
+			}
+
 			blobs = append(blobs, BlobInfo{
 				Path: file,
-				Mode: "100644",
+				Mode: mode,
 				Type: "blob",
 				Sha:  &blobSha,
 			})
